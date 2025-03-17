@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Clock, ChefHat, Users, Heart, BookmarkPlus, Share2, MessageSquare } from "lucide-react";
 import UserAvatar from "@/components/ui/UserAvatar";
-import { toast } from "@/components/ui/sonner";
+import { toast } from "@/hooks/use-toast";
 import { formatDistanceToNow } from "date-fns";
 import { Link } from "react-router-dom";
 

@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { UserPlus, Settings, Mail } from "lucide-react";
-import { toast } from "@/components/ui/sonner";
+import { toast } from "@/hooks/use-toast";
 import NotFound from "./NotFound";
 
 const ProfilePage = () => {

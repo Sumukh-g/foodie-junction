@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -13,7 +12,7 @@ import {
   SelectValue 
 } from "@/components/ui/select";
 import { X, Plus, Upload, ChefHat, Clock } from "lucide-react";
-import { toast } from "@/components/ui/sonner";
+import { toast } from "@/hooks/use-toast";
 
 const RecipeForm = () => {
   const navigate = useNavigate();
