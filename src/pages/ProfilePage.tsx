@@ -35,7 +35,9 @@ const ProfilePage = () => {
   // Handle follow button click
   const handleFollow = () => {
     setFollowing(!following);
-    toast(following ? `Unfollowed ${user.name}` : `Now following ${user.name}`);
+    toast({
+      description: following ? `Unfollowed ${user.name}` : `Now following ${user.name}`
+    });
   };
   
   // Calculate if this is the current user's profile

@@ -26,22 +26,30 @@ const RecipeDetail = ({ recipe }: RecipeDetailProps) => {
   
   const handleLike = () => {
     setLiked(!liked);
-    toast(liked ? "Removed from likes" : "Added to likes");
+    toast({
+      description: liked ? "Removed from likes" : "Added to likes"
+    });
   };
   
   const handleSave = () => {
     setSaved(!saved);
-    toast(saved ? "Removed from bookmarks" : "Saved to bookmarks");
+    toast({
+      description: saved ? "Removed from bookmarks" : "Saved to bookmarks"
+    });
   };
   
   const handleShare = () => {
     // In a real app, this would use the Web Share API or copy to clipboard
-    toast("Recipe link copied to clipboard!");
+    toast({
+      description: "Recipe link copied to clipboard!"
+    });
   };
   
   const handleComment = () => {
     if (comment.trim()) {
-      toast("Comment added");
+      toast({
+        description: "Comment added"
+      });
       setComment("");
       // In a real app, this would post the comment to the backend
     }

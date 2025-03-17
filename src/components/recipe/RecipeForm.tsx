@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -75,17 +76,25 @@ const RecipeForm = () => {
     
     // Validate form
     if (!title || !description || !category || !difficulty || !imagePreview) {
-      toast.error("Please fill in all required fields");
+      toast({
+        variant: "destructive",
+        description: "Please fill in all required fields"
+      });
       return;
     }
     
     if (ingredients.some(i => !i) || instructions.some(i => !i)) {
-      toast.error("Please fill in all ingredients and instructions");
+      toast({
+        variant: "destructive",
+        description: "Please fill in all ingredients and instructions"
+      });
       return;
     }
     
     // In a real app, this would submit to a backend
-    toast.success("Recipe published successfully!");
+    toast({
+      description: "Recipe published successfully!"
+    });
     
     // Navigate to the recipe detail page or home
     setTimeout(() => {
