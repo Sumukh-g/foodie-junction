@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/select";
 import { X, Plus, Upload, ChefHat, Clock } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
-import { recipes, users } from "@/lib/data";
+import { recipes, users, Recipe } from "@/lib/data";
 
 const RecipeForm = () => {
   const navigate = useNavigate();
@@ -23,7 +23,7 @@ const RecipeForm = () => {
   const [prepTime, setPrepTime] = useState(0);
   const [cookTime, setCookTime] = useState(0);
   const [servings, setServings] = useState(1);
-  const [difficulty, setDifficulty] = useState("");
+  const [difficulty, setDifficulty] = useState<"Easy" | "Medium" | "Hard">("Easy");
   const [ingredients, setIngredients] = useState<string[]>([""]);
   const [instructions, setInstructions] = useState<string[]>([""]);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -92,18 +92,18 @@ const RecipeForm = () => {
     }
     
     // Create a new recipe object
-    const newRecipe = {
+    const newRecipe: Recipe = {
       id: `recipe-${Date.now()}`,
       title,
       description,
+      image: imagePreview || "",
       category,
       prepTime,
       cookTime,
       servings,
-      difficulty,
+      difficulty, // This is now correctly typed as "Easy" | "Medium" | "Hard"
       ingredients: ingredients.filter(i => i.trim() !== ""),
       instructions: instructions.filter(i => i.trim() !== ""),
-      image: imagePreview || "",
       userId: users[0].id, // Assuming first user is the current user
       likes: 0,
       createdAt: new Date().toISOString(),
@@ -177,7 +177,11 @@ const RecipeForm = () => {
           
           <div className="space-y-2">
             <Label htmlFor="difficulty">Difficulty *</Label>
-            <Select value={difficulty} onValueChange={setDifficulty} required>
+            <Select 
+              value={difficulty} 
+              onValueChange={(value: "Easy" | "Medium" | "Hard") => setDifficulty(value)} 
+              required
+            >
               <SelectTrigger id="difficulty">
                 <SelectValue placeholder="Select difficulty" />
               </SelectTrigger>
