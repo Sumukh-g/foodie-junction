@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -14,6 +13,7 @@ import {
 } from "@/components/ui/select";
 import { X, Plus, Upload, ChefHat, Clock } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { recipes, users } from "@/lib/data";
 
 const RecipeForm = () => {
   const navigate = useNavigate();
@@ -91,14 +91,36 @@ const RecipeForm = () => {
       return;
     }
     
-    // In a real app, this would submit to a backend
+    // Create a new recipe object
+    const newRecipe = {
+      id: `recipe-${Date.now()}`,
+      title,
+      description,
+      category,
+      prepTime,
+      cookTime,
+      servings,
+      difficulty,
+      ingredients: ingredients.filter(i => i.trim() !== ""),
+      instructions: instructions.filter(i => i.trim() !== ""),
+      image: imagePreview || "",
+      userId: users[0].id, // Assuming first user is the current user
+      likes: 0,
+      createdAt: new Date().toISOString(),
+      comments: []
+    };
+    
+    // Add the new recipe to the recipes array
+    recipes.unshift(newRecipe);
+    
+    // Show success message
     toast({
       description: "Recipe published successfully!"
     });
     
-    // Navigate to the recipe detail page or home
+    // Navigate to the recipe detail page
     setTimeout(() => {
-      navigate("/");
+      navigate(`/recipe/${newRecipe.id}`);
     }, 1500);
   };
   
