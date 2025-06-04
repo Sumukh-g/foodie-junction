@@ -1,15 +1,15 @@
-
-import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
+import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Index from "./pages/Index";
-import RecipePage from "./pages/RecipePage";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import AIRecommendationsPage from "./pages/AIRecommendationsPage";
 import CreateRecipePage from "./pages/CreateRecipePage";
-import ProfilePage from "./pages/ProfilePage";
-import SavedRecipesPage from "./pages/SavedRecipesPage";
+import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
+import ProfilePage from "./pages/ProfilePage";
+import RecipePage from "./pages/RecipePage";
+import SavedRecipesPage from "./pages/SavedRecipesPage";
 
 const queryClient = new QueryClient();
 
@@ -23,6 +23,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/recipe/:id" element={<RecipePage />} />
           <Route path="/create" element={<CreateRecipePage />} />
+          <Route path="/ai-recommendations" element={<AIRecommendationsPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/profile/:username" element={<ProfilePage />} />
           <Route path="/saved" element={<SavedRecipesPage />} />

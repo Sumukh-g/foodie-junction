@@ -1,20 +1,20 @@
-
-import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { 
-  Search, 
-  PlusCircle, 
-  Home, 
-  User, 
-  Bookmark,
-  Menu,
-  X
-} from "lucide-react";
-import { useState } from "react";
-import { users } from "@/lib/data";
 import UserAvatar from "@/components/ui/UserAvatar";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { users } from "@/lib/data";
+import {
+    Bookmark,
+    Brain,
+    Home,
+    Menu,
+    PlusCircle,
+    Search,
+    User,
+    X
+} from "lucide-react";
+import { useState } from "react";
+import { Link } from "react-router-dom";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -51,6 +51,11 @@ const Navbar = () => {
               <Link to="/">
                 <Button variant="ghost" size="icon">
                   <Home className="h-5 w-5" />
+                </Button>
+              </Link>
+              <Link to="/ai-recommendations">
+                <Button variant="ghost" size="icon">
+                  <Brain className="h-5 w-5 text-purple-600" />
                 </Button>
               </Link>
               <Link to="/create">
@@ -102,6 +107,14 @@ const Navbar = () => {
                 >
                   <Home className="h-5 w-5" />
                   <span>Home</span>
+                </Link>
+                <Link 
+                  to="/ai-recommendations"
+                  className="flex items-center gap-3 p-2 hover:bg-purple-100 rounded-md bg-gradient-to-r from-purple-50 to-pink-50"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  <Brain className="h-5 w-5 text-purple-600" />
+                  <span className="font-medium text-purple-700">AI Chef</span>
                 </Link>
                 <Link 
                   to="/create"

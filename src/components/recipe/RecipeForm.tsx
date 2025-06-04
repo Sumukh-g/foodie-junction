@@ -1,19 +1,19 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue 
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue
 } from "@/components/ui/select";
-import { X, Plus, Upload, ChefHat, Clock } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/hooks/use-toast";
-import { recipes, users, Recipe } from "@/lib/data";
+import { recipes } from "@/lib/api";
+import { ChefHat, Clock, Plus, Upload, X } from "lucide-react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const RecipeForm = () => {
   const navigate = useNavigate();
@@ -27,6 +27,7 @@ const RecipeForm = () => {
   const [ingredients, setIngredients] = useState<string[]>([""]);
   const [instructions, setInstructions] = useState<string[]>([""]);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
   
   const handleAddIngredient = () => {
     setIngredients([...ingredients, ""]);
@@ -71,9 +72,9 @@ const RecipeForm = () => {
     }
   };
   
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+    if (loading) return;
     // Validate form
     if (!title || !description || !category || !difficulty || !imagePreview) {
       toast({
@@ -90,38 +91,34 @@ const RecipeForm = () => {
       });
       return;
     }
-    
-    // Create a new recipe object
-    const newRecipe: Recipe = {
-      id: `recipe-${Date.now()}`,
-      title,
-      description,
-      image: imagePreview || "",
-      category,
-      prepTime,
-      cookTime,
-      servings,
-      difficulty, // This is now correctly typed as "Easy" | "Medium" | "Hard"
-      ingredients: ingredients.filter(i => i.trim() !== ""),
-      instructions: instructions.filter(i => i.trim() !== ""),
-      userId: users[0].id, // Assuming first user is the current user
-      likes: 0,
-      createdAt: new Date().toISOString(),
-      comments: []
-    };
-    
-    // Add the new recipe to the recipes array
-    recipes.unshift(newRecipe);
-    
-    // Show success message
-    toast({
-      description: "Recipe published successfully!"
-    });
-    
-    // Navigate to the recipe detail page
-    setTimeout(() => {
-      navigate(`/recipe/${newRecipe.id}`);
-    }, 1500);
+    setLoading(true);
+    try {
+      // Prepare recipe data for backend
+      const recipeData = {
+        title,
+        description,
+        ingredients: ingredients.filter(i => i.trim() !== ""),
+        instructions: instructions.filter(i => i.trim() !== ""),
+        cookingTime: prepTime + cookTime,
+        difficulty,
+        imageUrl: imagePreview,
+        // Optionally, you can add category, servings, etc. if your backend supports it
+      };
+      const response = await recipes.create(recipeData);
+      toast({ description: "Recipe published successfully!" });
+      // Navigate to the recipe detail page using the real MongoDB _id
+      setTimeout(() => {
+        navigate(`/recipe/${response.data._id}`);
+      }, 1000);
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        description:
+          error?.response?.data?.message || "Failed to publish recipe. Please try again."
+      });
+    } finally {
+      setLoading(false);
+    }
   };
   
   return (
@@ -352,8 +349,9 @@ const RecipeForm = () => {
         <Button 
           type="submit" 
           className="bg-foodie-primary hover:bg-foodie-primary/80"
+          disabled={loading}
         >
-          Publish Recipe
+          {loading ? "Publishing..." : "Publish Recipe"}
         </Button>
       </div>
     </form>

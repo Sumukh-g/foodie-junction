@@ -1,18 +1,15 @@
-
-import { Recipe, getUserById } from "@/lib/data";
-import { useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
+import NutritionCalculator from "@/components/features/NutritionCalculator";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { Clock, ChefHat, Users, Heart, BookmarkPlus, Share2, MessageSquare } from "lucide-react";
-import UserAvatar from "@/components/ui/UserAvatar";
 import { toast } from "@/hooks/use-toast";
 import { formatDistanceToNow } from "date-fns";
-import { Link } from "react-router-dom";
+import { BookmarkPlus, ChefHat, Clock, Heart, MessageSquare, Share2, Users } from "lucide-react";
+import { useState } from "react";
 
 interface RecipeDetailProps {
-  recipe: Recipe;
+  recipe: any; // Using any since backend structure is different from mock data
 }
 
 const RecipeDetail = ({ recipe }: RecipeDetailProps) => {
@@ -20,9 +17,8 @@ const RecipeDetail = ({ recipe }: RecipeDetailProps) => {
   const [saved, setSaved] = useState(false);
   const [comment, setComment] = useState("");
   
-  const user = getUserById(recipe.userId);
-  
-  if (!user) return null;
+  // Handle missing author gracefully
+  const author = recipe.author || { username: "anonymous", name: "Anonymous" };
   
   const handleLike = () => {
     setLiked(!liked);
@@ -62,9 +58,11 @@ const RecipeDetail = ({ recipe }: RecipeDetailProps) => {
         <h1 className="font-display text-3xl md:text-4xl font-bold">{recipe.title}</h1>
         
         <div className="flex flex-wrap items-center gap-2">
-          <Badge variant="outline" className="bg-foodie-primary/10 text-foodie-primary">
-            {recipe.category}
-          </Badge>
+          {recipe.category && (
+            <Badge variant="outline" className="bg-foodie-primary/10 text-foodie-primary">
+              {recipe.category}
+            </Badge>
+          )}
           <Badge variant="outline" className="bg-foodie-secondary/10 text-foodie-secondary">
             {recipe.difficulty}
           </Badge>
@@ -73,22 +71,24 @@ const RecipeDetail = ({ recipe }: RecipeDetailProps) => {
         <p className="text-lg text-gray-700">{recipe.description}</p>
         
         <div className="flex items-center gap-4">
-          <Link to={`/profile/${user.username}`} className="flex items-center gap-2">
-            <UserAvatar user={user} />
+          <div className="flex items-center gap-2">
+            <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center text-sm font-bold text-white">
+              {author.name ? author.name[0] : "A"}
+            </div>
             <div>
-              <p className="font-medium">{user.name}</p>
+              <p className="font-medium">{author.name}</p>
               <p className="text-sm text-gray-500">
                 {formatDistanceToNow(new Date(recipe.createdAt), { addSuffix: true })}
               </p>
             </div>
-          </Link>
+          </div>
         </div>
       </div>
       
       {/* Recipe image */}
       <div className="rounded-lg overflow-hidden h-80 md:h-96">
         <img 
-          src={recipe.image} 
+          src={recipe.imageUrl} 
           alt={recipe.title} 
           className="w-full h-full object-cover"
         />
@@ -99,8 +99,8 @@ const RecipeDetail = ({ recipe }: RecipeDetailProps) => {
         <Card>
           <CardContent className="p-4 flex flex-col items-center justify-center">
             <Clock className="h-6 w-6 mb-1 text-foodie-primary" />
-            <p className="text-sm text-gray-500">Total Time</p>
-            <p className="font-medium">{recipe.prepTime + recipe.cookTime} min</p>
+            <p className="text-sm text-gray-500">Cooking Time</p>
+            <p className="font-medium">{recipe.cookingTime} min</p>
           </CardContent>
         </Card>
         <Card>
@@ -114,7 +114,7 @@ const RecipeDetail = ({ recipe }: RecipeDetailProps) => {
           <CardContent className="p-4 flex flex-col items-center justify-center">
             <Users className="h-6 w-6 mb-1 text-foodie-primary" />
             <p className="text-sm text-gray-500">Servings</p>
-            <p className="font-medium">{recipe.servings}</p>
+            <p className="font-medium">{recipe.servings || "N/A"}</p>
           </CardContent>
         </Card>
       </div>
@@ -147,7 +147,7 @@ const RecipeDetail = ({ recipe }: RecipeDetailProps) => {
       <div>
         <h2 className="font-display text-2xl font-bold mb-4">Ingredients</h2>
         <ul className="space-y-2">
-          {recipe.ingredients.map((ingredient, index) => (
+          {recipe.ingredients && recipe.ingredients.map((ingredient: string, index: number) => (
             <li key={index} className="flex items-center gap-2">
               <div className="h-2 w-2 rounded-full bg-foodie-primary" />
               <span>{ingredient}</span>
@@ -160,7 +160,7 @@ const RecipeDetail = ({ recipe }: RecipeDetailProps) => {
       <div>
         <h2 className="font-display text-2xl font-bold mb-4">Instructions</h2>
         <ol className="space-y-4">
-          {recipe.instructions.map((instruction, index) => (
+          {recipe.instructions && recipe.instructions.map((instruction: string, index: number) => (
             <li key={index} className="flex gap-4">
               <div className="flex-shrink-0 flex items-center justify-center h-8 w-8 rounded-full bg-foodie-primary text-white font-bold">
                 {index + 1}
@@ -170,10 +170,18 @@ const RecipeDetail = ({ recipe }: RecipeDetailProps) => {
           ))}
         </ol>
       </div>
+
+      {/* Nutrition Calculator */}
+      {recipe.ingredients && (
+        <NutritionCalculator 
+          ingredients={recipe.ingredients} 
+          servings={recipe.servings || 4} 
+        />
+      )}
       
       {/* Comments section */}
       <div className="pt-6 border-t border-gray-200">
-        <h2 className="font-display text-2xl font-bold mb-4">Comments ({recipe.comments.length})</h2>
+        <h2 className="font-display text-2xl font-bold mb-4">Comments (0)</h2>
         
         {/* Add comment */}
         <div className="mb-6 space-y-4">
@@ -185,29 +193,10 @@ const RecipeDetail = ({ recipe }: RecipeDetailProps) => {
           <Button onClick={handleComment} disabled={!comment.trim()}>Post Comment</Button>
         </div>
         
-        {/* Comments list */}
-        <div className="space-y-4">
-          {recipe.comments.map((comment) => {
-            const commentUser = getUserById(comment.userId);
-            if (!commentUser) return null;
-            
-            return (
-              <div key={comment.id} className="flex gap-3">
-                <UserAvatar user={commentUser} />
-                <div className="flex-1">
-                  <div className="bg-gray-100 rounded-lg p-3">
-                    <Link to={`/profile/${commentUser.username}`} className="font-medium hover:underline">
-                      {commentUser.name}
-                    </Link>
-                    <p className="mt-1">{comment.content}</p>
-                  </div>
-                  <p className="text-sm text-gray-500 mt-1">
-                    {formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true })}
-                  </p>
-                </div>
-              </div>
-            );
-          })}
+        {/* Comments list - placeholder for future implementation */}
+        <div className="text-center py-8 text-gray-500">
+          <MessageSquare className="h-12 w-12 mx-auto mb-2 opacity-50" />
+          <p>No comments yet. Be the first to share your thoughts!</p>
         </div>
       </div>
     </div>
